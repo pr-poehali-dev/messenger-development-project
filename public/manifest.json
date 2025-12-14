@@ -1,0 +1,27 @@
+{
+  "name": "Мессенджер",
+  "short_name": "Мессенджер",
+  "description": "Современный мессенджер для общения с друзьями и группами",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#9b87f5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "communication"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Новый чат",
+      "url": "/?action=new-chat",
+      "description": "Начать новый чат"
+    }
+  ]
+}
