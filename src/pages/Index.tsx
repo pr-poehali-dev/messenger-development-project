@@ -7,6 +7,7 @@ import { IncomingCall } from '@/components/IncomingCall';
 import { OutgoingCall } from '@/components/OutgoingCall';
 import { CallWindow } from '@/components/CallWindow';
 import { InstallPrompt } from '@/components/InstallPrompt';
+import { InstallBanner } from '@/components/InstallBanner';
 import { useWebRTC } from '@/hooks/useWebRTC';
 
 export interface User {
@@ -319,8 +320,11 @@ const Index = () => {
   const selectedChatData = chats.find((chat) => chat.id === selectedChat);
 
   return (
-    <div className="h-screen flex bg-background overflow-hidden">
-      <ChatList
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
+      <InstallBanner />
+      
+      <div className="flex flex-1 overflow-hidden">
+        <ChatList
         chats={chats}
         selectedChatId={selectedChat}
         onSelectChat={setSelectedChat}
@@ -400,6 +404,7 @@ const Index = () => {
       )}
 
       <InstallPrompt />
+      </div>
     </div>
   );
 };

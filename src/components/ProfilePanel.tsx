@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePWA } from '@/hooks/usePWA';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,6 +23,7 @@ interface ProfilePanelProps {
 export const ProfilePanel = ({ user, onClose }: ProfilePanelProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(user);
+  const { isInstallable, isInstalled, installApp } = usePWA();
 
   const handleSave = () => {
     setIsEditing(false);
@@ -161,6 +163,42 @@ export const ProfilePanel = ({ user, onClose }: ProfilePanelProps) => {
                     <Button size="sm" className="w-full">
                       Купить Premium за 199₽/мес
                     </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {isInstallable && !isInstalled && (
+              <div className="border border-primary/20 rounded-lg p-4 bg-primary/5">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Icon name="Download" size={20} className="text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold mb-1">Установить приложение</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Добавьте мессенджер на главный экран для быстрого доступа
+                    </p>
+                    <Button size="sm" className="w-full" onClick={installApp}>
+                      <Icon name="Download" size={16} className="mr-2" />
+                      Установить сейчас
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {isInstalled && (
+              <div className="border border-green-500/20 rounded-lg p-4 bg-green-500/5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <Icon name="Check" size={20} className="text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-green-700">Приложение установлено</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Мессенджер добавлен на ваше устройство
+                    </p>
                   </div>
                 </div>
               </div>
