@@ -12,6 +12,7 @@ interface ChatWindowProps {
   currentUserId: string;
   onSendMessage: (text: string) => void;
   users: User[];
+  onStartCall: (userId: string, isVideo: boolean) => void;
 }
 
 export const ChatWindow = ({
@@ -20,6 +21,7 @@ export const ChatWindow = ({
   currentUserId,
   onSendMessage,
   users,
+  onStartCall,
 }: ChatWindowProps) => {
   const [messageText, setMessageText] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -85,12 +87,36 @@ export const ChatWindow = ({
         </div>
 
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <Icon name="Phone" size={20} />
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <Icon name="Video" size={20} />
-          </Button>
+          {chat.type === 'direct' && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
+                onClick={() => {
+                  const recipientId = chat.participants.find(
+                    (id) => id !== currentUserId
+                  );
+                  if (recipientId) onStartCall(recipientId, false);
+                }}
+              >
+                <Icon name="Phone" size={20} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
+                onClick={() => {
+                  const recipientId = chat.participants.find(
+                    (id) => id !== currentUserId
+                  );
+                  if (recipientId) onStartCall(recipientId, true);
+                }}
+              >
+                <Icon name="Video" size={20} />
+              </Button>
+            </>
+          )}
           <Button variant="ghost" size="icon" className="rounded-full">
             <Icon name="Search" size={20} />
           </Button>

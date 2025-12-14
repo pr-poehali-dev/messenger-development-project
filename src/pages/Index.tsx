@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChatList } from '@/components/ChatList';
 import { ChatWindow } from '@/components/ChatWindow';
 import { ProfilePanel } from '@/components/ProfilePanel';
 import { SearchUsers } from '@/components/SearchUsers';
+import { IncomingCall } from '@/components/IncomingCall';
+import { OutgoingCall } from '@/components/OutgoingCall';
+import { CallWindow } from '@/components/CallWindow';
+import { useWebRTC } from '@/hooks/useWebRTC';
 
 export interface User {
   id: string;
@@ -145,6 +149,39 @@ const Index = () => {
   const [selectedChat, setSelectedChat] = useState<string | null>('chat1');
   const [showProfile, setShowProfile] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [incomingCall, setIncomingCall] = useState<{ userId: string; isVideo: boolean } | null>(null);
+  const [outgoingCall, setOutgoingCall] = useState<{ userId: string; isVideo: boolean } | null>(null);
+  const [callDuration, setCallDuration] = useState(0);
+
+  const {
+    isCallActive,
+    isVideoEnabled,
+    isMuted,
+    remoteUserId,
+    localStream,
+    remoteStream,
+    startCall,
+    answerCall,
+    endCall,
+    toggleMute,
+    toggleVideo,
+  } = useWebRTC({
+    onCallEnded: () => {
+      setIncomingCall(null);
+      setOutgoingCall(null);
+      setCallDuration(0);
+    },
+  });
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isCallActive) {
+      interval = setInterval(() => {
+        setCallDuration((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isCallActive]);
 
   const handleSendMessage = (text: string) => {
     if (!selectedChat || !text.trim()) return;
@@ -241,6 +278,39 @@ const Index = () => {
     setShowSearch(false);
   };
 
+  const handleStartCall = async (userId: string, isVideo: boolean) => {
+    setOutgoingCall({ userId, isVideo });
+    try {
+      await startCall(userId, isVideo);
+      setTimeout(() => {
+        setOutgoingCall(null);
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to start call:', error);
+      setOutgoingCall(null);
+    }
+  };
+
+  const handleAcceptCall = async () => {
+    if (!incomingCall) return;
+    try {
+      await answerCall(incomingCall.userId, incomingCall.isVideo);
+      setIncomingCall(null);
+    } catch (error) {
+      console.error('Failed to answer call:', error);
+      setIncomingCall(null);
+    }
+  };
+
+  const handleDeclineCall = () => {
+    setIncomingCall(null);
+  };
+
+  const handleCancelOutgoingCall = () => {
+    setOutgoingCall(null);
+    endCall();
+  };
+
   const currentChatMessages = messages.filter(
     (msg) => msg.chatId === selectedChat
   );
@@ -268,6 +338,7 @@ const Index = () => {
           currentUserId={currentUser.id}
           onSendMessage={handleSendMessage}
           users={users}
+          onStartCall={handleStartCall}
         />
       ) : (
         <div className="flex-1 flex items-center justify-center text-muted-foreground">
@@ -292,6 +363,38 @@ const Index = () => {
           onClose={() => setShowSearch(false)}
           onStartChat={handleStartDirectChat}
           onCreateGroup={handleCreateGroup}
+        />
+      )}
+
+      {incomingCall && (
+        <IncomingCall
+          caller={users.find((u) => u.id === incomingCall.userId)!}
+          isVideo={incomingCall.isVideo}
+          onAccept={handleAcceptCall}
+          onDecline={handleDeclineCall}
+        />
+      )}
+
+      {outgoingCall && !isCallActive && (
+        <OutgoingCall
+          recipient={users.find((u) => u.id === outgoingCall.userId)!}
+          isVideo={outgoingCall.isVideo}
+          onCancel={handleCancelOutgoingCall}
+        />
+      )}
+
+      {isCallActive && remoteUserId && (
+        <CallWindow
+          user={users.find((u) => u.id === remoteUserId)!}
+          isVideo={isVideoEnabled}
+          isMuted={isMuted}
+          isVideoEnabled={isVideoEnabled}
+          localStream={localStream}
+          remoteStream={remoteStream}
+          onEndCall={endCall}
+          onToggleMute={toggleMute}
+          onToggleVideo={toggleVideo}
+          callDuration={callDuration}
         />
       )}
     </div>
