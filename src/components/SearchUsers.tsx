@@ -39,12 +39,14 @@ export const SearchUsers = ({
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [groupName, setGroupName] = useState('');
 
+  const searchTerm = searchQuery.toLowerCase().replace('@', '');
+  
   const filteredUsers = users
     .filter((user) => user.id !== currentUserId)
     .filter(
       (user) =>
-        user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.displayName.toLowerCase().includes(searchQuery.toLowerCase())
+        user.username.toLowerCase().includes(searchTerm) ||
+        user.displayName.toLowerCase().includes(searchTerm)
     );
 
   const toggleUserSelection = (userId: string) => {
@@ -103,10 +105,11 @@ export const SearchUsers = ({
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 />
                 <Input
-                  placeholder="Поиск по никнейму..."
+                  placeholder="Найти пользователя (@никнейм или имя)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
+                  autoFocus
                 />
               </div>
             </div>
@@ -115,7 +118,14 @@ export const SearchUsers = ({
               {filteredUsers.length === 0 ? (
                 <div className="p-8 text-center text-muted-foreground">
                   <Icon name="Users" size={48} className="mx-auto mb-2 opacity-20" />
-                  <p>Пользователи не найдены</p>
+                  {searchQuery.trim() ? (
+                    <div>
+                      <p className="font-medium mb-1">Пользователь не найден</p>
+                      <p className="text-sm">Попробуйте ввести @{searchQuery.replace('@', '')} или другой никнейм</p>
+                    </div>
+                  ) : (
+                    <p>Начните вводить никнейм для поиска</p>
+                  )}
                 </div>
               ) : (
                 <div className="divide-y">
@@ -184,7 +194,7 @@ export const SearchUsers = ({
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 />
                 <Input
-                  placeholder="Добавить участников..."
+                  placeholder="Найти по @никнейму..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -202,7 +212,14 @@ export const SearchUsers = ({
               {filteredUsers.length === 0 ? (
                 <div className="p-8 text-center text-muted-foreground">
                   <Icon name="Users" size={48} className="mx-auto mb-2 opacity-20" />
-                  <p>Пользователи не найдены</p>
+                  {searchQuery.trim() ? (
+                    <div>
+                      <p className="font-medium mb-1">Пользователь не найден</p>
+                      <p className="text-sm">Проверьте правильность никнейма</p>
+                    </div>
+                  ) : (
+                    <p>Введите никнейм для поиска</p>
+                  )}
                 </div>
               ) : (
                 <div className="divide-y">
