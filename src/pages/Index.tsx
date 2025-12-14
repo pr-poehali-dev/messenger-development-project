@@ -6,6 +6,7 @@ import { SearchUsers } from '@/components/SearchUsers';
 import { IncomingCall } from '@/components/IncomingCall';
 import { OutgoingCall } from '@/components/OutgoingCall';
 import { CallWindow } from '@/components/CallWindow';
+import { InstallPrompt } from '@/components/InstallPrompt';
 import { useWebRTC } from '@/hooks/useWebRTC';
 
 export interface User {
@@ -397,6 +398,8 @@ const Index = () => {
           callDuration={callDuration}
         />
       )}
+
+      <InstallPrompt />
     </div>
   );
 };

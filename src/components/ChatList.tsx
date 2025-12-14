@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePWA } from '@/hooks/usePWA';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -37,6 +38,7 @@ export const ChatList = ({
   currentUser,
 }: ChatListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const { isInstallable, installApp } = usePWA();
 
   const filteredChats = chats
     .filter((chat) =>
@@ -98,10 +100,16 @@ export const ChatList = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={onShowSearch}>
                   <Icon name="Users" size={16} className="mr-2" />
                   Создать группу
                 </DropdownMenuItem>
+                {isInstallable && (
+                  <DropdownMenuItem onClick={installApp}>
+                    <Icon name="Download" size={16} className="mr-2" />
+                    Установить приложение
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem>
                   <Icon name="Settings" size={16} className="mr-2" />
                   Настройки
